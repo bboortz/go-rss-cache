@@ -14,6 +14,8 @@ func NewRouter() *httprouter.Router {
     router.GET("/hello/:name", Hello)
     router.PUT("/service", ServiceCreate)
     router.POST("/service", ServiceCreate)
+	router.GET("/service/:name", ServiceRead)
+	router.GET("/services", ServicesRead)
 	router.NotFound = http.FileServer(http.Dir("public"))
 
 	return router

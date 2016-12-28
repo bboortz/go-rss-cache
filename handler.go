@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"net/http"
     "github.com/julienschmidt/httprouter"
+//	"github.com/davecgh/go-spew/spew"
 )
 
 
@@ -19,8 +20,7 @@ func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	w.WriteHeader(http.StatusOK)
-	logAccess("Index", r.Method, r.RequestURI, start)
-	printStack()
+	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
 	fmt.Fprint(w, "{'api': 'go-router, 'api-version': '.0.1'}")
 }
 
@@ -28,7 +28,7 @@ func Alive(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	w.WriteHeader(http.StatusOK)
-	logAccess("Test", r.Method, r.RequestURI, start)
+	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
 	fmt.Fprint(w, "{'alive': true}")
 }
 
@@ -37,7 +37,7 @@ func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	w.WriteHeader(http.StatusOK)
     fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
-	logAccess("Hello", r.Method, r.RequestURI, start)
+	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
 }
 
 func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
@@ -54,11 +54,11 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		panic(err)
 	}
 	if err := json.Unmarshal(body, &service); err != nil {
-		w.WriteHeader(422) // unprocessable entity
+		w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+		w.WriteHeader(422) 
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
 		}
-	//	return
 	}
 
 	w.WriteHeader(http.StatusCreated)
@@ -66,8 +66,24 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	addService(service)
 
 	fmt.Fprintf(w, "{'service': %s, 'status': '%s'}", service.Name, "created")
-	logAccess("ServiceCreate", r.Method, r.RequestURI, start)
+	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
 
-	fmt.Println(service)
 }
 
+
+func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	start := time.Now()
+	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
+	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
+}
+
+func ServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	start := time.Now()
+	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	w.WriteHeader(http.StatusOK)
+    fmt.Fprintf(w, "%s!\n", services)
+	fmt.Println(services)
+	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
+}
