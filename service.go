@@ -33,4 +33,13 @@ func addService(s Service) Service {
 	return s
 }
 
+func findService(name string) Service {
+	for _, s := range services {
+		if s.Name == name {
+			return s
+		}
+	}
+	// return empty Todo if not found
+	return Service{}
+}
 

@@ -32,14 +32,6 @@ func Alive(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	fmt.Fprint(w, "{'alive': true}")
 }
 
-func Hello(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	start := time.Now()
-	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
-	w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
-	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
-}
-
 func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
@@ -62,7 +54,6 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	}
 
 	w.WriteHeader(http.StatusCreated)
-
 	addService(service)
 
 	fmt.Fprintf(w, "{'service': %s, 'status': '%s'}", service.Name, "created")
@@ -74,8 +65,22 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	serviceName := ps.ByName("name")
+	s := findService(serviceName)
+
+	if (s.Name == "") {
+		w.WriteHeader(http.StatusNotFound)
+		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Not Found"}); err != nil {
+			panic(err)
+		}
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, "hello, %s!\n", ps.ByName("name"))
+	if err := json.NewEncoder(w).Encode(s); err != nil {
+		panic(err)
+	}
+
 	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
 }
 
@@ -84,6 +89,8 @@ func ServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	w.WriteHeader(http.StatusOK)
     fmt.Fprintf(w, "%s!\n", services)
-	fmt.Println(services)
+	if err := json.NewEncoder(w).Encode(services); err != nil {
+		panic(err)
+	}
 	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
 }

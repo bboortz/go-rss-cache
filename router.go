@@ -11,7 +11,6 @@ func NewRouter() *httprouter.Router {
     router := httprouter.New()
     router.GET("/", Index)
     router.GET("/alive", Alive)
-    router.GET("/hello/:name", Hello)
     router.PUT("/service", ServiceCreate)
     router.POST("/service", ServiceCreate)
 	router.GET("/service/:name", ServiceRead)
