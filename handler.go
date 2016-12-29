@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 	"io"
 	"io/ioutil"
@@ -13,6 +14,15 @@ import (
 
 var headerContentTypeKey string = "Content-Type"
 var headerContentTypeValue string = "application/json; charset=UTF-8"
+
+
+func log2(fn http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("Before")
+		fn(w, r)
+		fmt.Println("After")
+	}
+}
 
 /*
  * usage: curl -H "Content-Type: application/json" http://localhost:9090
@@ -139,21 +149,27 @@ func HandlerServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.P
  */
 
 func NotFound(w http.ResponseWriter, r *http.Request) { 
+	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
-	w.WriteHeader(http.StatusNotFound)
-	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Not Found"}); err != nil {
+	var statusCode int = http.StatusNotFound
+	w.WriteHeader(statusCode)
+	if err := json.NewEncoder(w).Encode(jsonErr{Code: statusCode, Text: "Not Found"}); err != nil {
 		panic(err)
 	}
+	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 func NotFoundHandler() http.Handler { return http.HandlerFunc(NotFound) }
 
 
 func MethodNotAllowed(w http.ResponseWriter, r *http.Request) { 
+	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
-	w.WriteHeader(http.StatusMethodNotAllowed)
-	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusMethodNotAllowed, Text: "Method Not Allowed"}); err != nil {
+	var statusCode int = http.StatusMethodNotAllowed
+	w.WriteHeader(statusCode)
+	if err := json.NewEncoder(w).Encode(jsonErr{Code: statusCode, Text: "Method Not Allowed"}); err != nil {
 		panic(err)
 	}
+	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 func MethodNotAllowedHandler() http.Handler { return http.HandlerFunc(MethodNotAllowed) }
 
