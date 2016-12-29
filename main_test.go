@@ -6,15 +6,13 @@ import (
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
-	"github.com/davecgh/go-spew/spew"
+	"github.com/op/go-logging"
+	//"github.com/davecgh/go-spew/spew"
 )
 
-type ServiceInfo struct {
-	Api				string `json:"api"`
-	ApiVersion		string `json:"api-version"`
-}
-
 func getIndex(url string) (string, error) {
+	var log = logging.MustGetLogger("test-getIndex")
+
 	response, err := http.Get(url)
 	if err != nil {
 		return "", err
@@ -26,16 +24,15 @@ func getIndex(url string) (string, error) {
 		return "", err
 	}
 	
-	var serviceInfo ServiceInfo
-	if err := json.Unmarshal(body, &serviceInfo); err != nil {
+	var api Api
+	if err := json.Unmarshal(body, &api); err != nil {
 		fmt.Println("ERROR: ", err)
 		return "", err
 	}
-	tag := serviceInfo.Api
-	fmt.Println("tag: ", tag)
-	spew.Dump(body)
-	spew.Dump(serviceInfo)
-	return tag, nil
+	log.Infof( "api: %s (%s)", api.ApiName, api.ApiVersion )
+	trace()
+	fmt.Println( getMethodName() )
+	return api.ApiName, nil
 }
 
 func TestApiIndex(t *testing.T) {

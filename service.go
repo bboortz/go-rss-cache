@@ -13,6 +13,11 @@ type Service struct {
 	Due       time.Time `json:"due"`
 }
 
+type ServiceCreated struct {
+	Service		string       `json:"Service"`
+	Status		string       `json:"Status"`
+}
+
 type Services []Service
 var services Services
 var currentId = 0
