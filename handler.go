@@ -15,15 +15,20 @@ import (
 var headerContentTypeKey string = "Content-Type"
 var headerContentTypeValue string = "application/json; charset=UTF-8"
 
-
+/*
+ * usage: curl -H "Content-Type: application/json" http://localhost:9090
+ */
 func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	w.WriteHeader(http.StatusOK)
 	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
-	fmt.Fprint(w, "{'api': 'go-router, 'api-version': '.0.1'}")
+	fmt.Fprint(w, "{\"api\": \"go-router\", \"api-version\": \"0.1\"}")
 }
 
+/*
+ * usage: curl -H "Content-Type: application/json" http://localhost:9090
+ */
 func Alive(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
@@ -32,6 +37,9 @@ func Alive(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	fmt.Fprint(w, "{'alive': true}")
 }
 
+/*
+ * usage: curl -H "Content-Type: application/json" -d '{"name":"go-testapi"}' http://localhost:9090/service
+ */
 func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
@@ -62,6 +70,9 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 }
 
 
+/*
+ * usage: curl -H "Content-Type: application/json" http://localhost:9090/services/:name
+ */
 func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
@@ -84,11 +95,13 @@ func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
 }
 
+/*
+ * usage: curl -H "Content-Type: application/json" http://localhost:9090/services
+ */
 func ServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	w.WriteHeader(http.StatusOK)
-    fmt.Fprintf(w, "%s!\n", services)
 	if err := json.NewEncoder(w).Encode(services); err != nil {
 		panic(err)
 	}
