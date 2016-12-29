@@ -13,6 +13,10 @@ type Service struct {
 	Due       time.Time `json:"due"`
 }
 
+type ServiceCreate struct {
+	Name      string    `json:"Name"`
+}
+
 type ServiceCreated struct {
 	Service		string       `json:"Service"`
 	Status		string       `json:"Status"`

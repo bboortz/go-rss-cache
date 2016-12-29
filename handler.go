@@ -17,7 +17,7 @@ var headerContentTypeValue string = "application/json; charset=UTF-8"
 /*
  * usage: curl -H "Content-Type: application/json" http://localhost:9090
  */
-func IndexRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func HandlerIndexRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusOK
@@ -35,7 +35,7 @@ func IndexRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 /*
  * usage: curl -H "Content-Type: application/json" http://localhost:9090
  */
-func AliveRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func HandlerAliveRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusOK
@@ -53,7 +53,7 @@ func AliveRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 /*
  * usage: curl -H "Content-Type: application/json" -d '{"name":"go-testapi"}' http://localhost:9090/service
  */
-func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func HandlerServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusCreated
@@ -91,7 +91,7 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 /*
  * usage: curl -H "Content-Type: application/json" http://localhost:9090/services/:name
  */
-func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func HandlerServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusOK
@@ -119,7 +119,7 @@ func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 /*
  * usage: curl -H "Content-Type: application/json" http://localhost:9090/services
  */
-func ServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func HandlerServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusOK
@@ -131,4 +131,29 @@ func ServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 	}
 	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
+
+
+
+/*
+ * error handler
+ */
+
+func NotFound(w http.ResponseWriter, r *http.Request) { 
+	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	w.WriteHeader(http.StatusNotFound)
+	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Not Found"}); err != nil {
+		panic(err)
+	}
+}
+func NotFoundHandler() http.Handler { return http.HandlerFunc(NotFound) }
+
+
+func MethodNotAllowed(w http.ResponseWriter, r *http.Request) { 
+	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	w.WriteHeader(http.StatusMethodNotAllowed)
+	if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusMethodNotAllowed, Text: "Method Not Allowed"}); err != nil {
+		panic(err)
+	}
+}
+func MethodNotAllowedHandler() http.Handler { return http.HandlerFunc(MethodNotAllowed) }
 

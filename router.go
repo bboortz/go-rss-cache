@@ -1,7 +1,6 @@
 package main
 
 import (
-	"net/http"
     "github.com/julienschmidt/httprouter"
 )
 
@@ -9,13 +8,14 @@ import (
 func NewRouter() *httprouter.Router {
 //	log := logging.MustGetLogger("go-router")
     router := httprouter.New()
-    router.GET("/", IndexRead)
-    router.GET("/alive", AliveRead)
-    router.PUT("/service", ServiceCreate)
-    router.POST("/service", ServiceCreate)
-	router.GET("/service/:name", ServiceRead)
-	router.GET("/services", ServicesRead)
-	router.NotFound = http.FileServer(http.Dir("public"))
+    router.GET("/", HandlerIndexRead)
+    router.GET("/alive", HandlerAliveRead)
+    router.PUT("/service", HandlerServiceCreate)
+    router.POST("/service", HandlerServiceCreate)
+	router.GET("/service/:name", HandlerServiceRead)
+	router.GET("/services", HandlerServicesRead)
+	router.NotFound = NotFoundHandler()
+	router.MethodNotAllowed = MethodNotAllowedHandler()
 
 	return router
 }
