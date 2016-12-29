@@ -16,6 +16,7 @@ type Service struct {
 type ServiceCreated struct {
 	Service		string       `json:"Service"`
 	Status		string       `json:"Status"`
+	Desc		string       `json:"Desc"`
 }
 
 type Services []Service

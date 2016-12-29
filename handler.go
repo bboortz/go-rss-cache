@@ -23,8 +23,9 @@ func IndexRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var statusCode int = http.StatusOK
 	var result Api
 
-	w.WriteHeader(statusCode)
 	result = Api{ApiName: "go-router", ApiVersion: "0.1",}
+
+	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
@@ -40,8 +41,9 @@ func AliveRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var statusCode int = http.StatusOK
 	var result Alive
 
-	w.WriteHeader(statusCode)
 	result = Alive{Alive: true,}
+
+	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
@@ -63,20 +65,22 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		panic(err)
 	}
 	if err := r.Body.Close(); err != nil {
+		log.Info("11")
 		panic(err)
 	}
+
 	if err := json.Unmarshal(body, &service); err != nil {
-		w.Header().Set(headerContentTypeKey, headerContentTypeValue)
-		w.WriteHeader(422) 
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
+		statusCode = 422 // 422 - Unprocessable Entity
+		result = ServiceCreated{Service: service.Name, Status: "failed", Desc: err.Error(),}
+	} else if (service.Name == "") {
+		statusCode = 422 // 422 - Unprocessable Entity
+		result = ServiceCreated{Service: service.Name, Status: "failed", Desc: "service name is empty",}
+	} else {
+		addService(service)
+		result = ServiceCreated{Service: service.Name, Status: "created", Desc: ""}
 	}
 
 	w.WriteHeader(statusCode)
-	addService(service)
-
-	result = ServiceCreated{Service: service.Name, Status: "created",}
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
@@ -109,7 +113,6 @@ func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
-
 	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 
