@@ -20,13 +20,15 @@ var headerContentTypeValue string = "application/json; charset=UTF-8"
 func IndexRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	var statusCode int = http.StatusOK
+	var result Api
 
-	w.WriteHeader(http.StatusOK)
-	var result Api = Api{ApiName: "go-router", ApiVersion: "0.1",}
+	w.WriteHeader(statusCode)
+	result = Api{ApiName: "go-router", ApiVersion: "0.1",}
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
-	logAccess(getMethodName(), r.Method, r.RequestURI, start)
+	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 
 /*
@@ -35,13 +37,15 @@ func IndexRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func AliveRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	var statusCode int = http.StatusOK
+	var result Alive
 
-	w.WriteHeader(http.StatusOK)
-	var result Alive = Alive{Alive: true,}
+	w.WriteHeader(statusCode)
+	result = Alive{Alive: true,}
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
-	logAccess(getMethodName(), r.Method, r.RequestURI, start)
+	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 
 /*
@@ -50,6 +54,8 @@ func AliveRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	var statusCode int = http.StatusCreated
+	var result ServiceCreated
 
 	var service Service
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -67,14 +73,14 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		}
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(statusCode)
 	addService(service)
 
-	var result ServiceCreated = ServiceCreated{Service: service.Name, Status: "created",}
+	result = ServiceCreated{Service: service.Name, Status: "created",}
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
-	logAccess(getMethodName(), r.Method, r.RequestURI, start)
+	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 
 
@@ -84,9 +90,12 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	var statusCode int = http.StatusOK
+	var result Service
+
 
 	serviceName := ps.ByName("name")
-	result := findService(serviceName)
+	result = findService(serviceName)
 
 	if (result.Name == "") {
 		w.WriteHeader(http.StatusNotFound)
@@ -96,12 +105,12 @@ func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
 
-	logAccess(getMethodName(), r.Method, r.RequestURI, start)
+	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 
 /*
@@ -110,9 +119,13 @@ func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func ServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(services); err != nil {
+	var statusCode int = http.StatusOK
+	var result Services = services
+
+	w.WriteHeader(statusCode)
+	if err := json.NewEncoder(w).Encode(result); err != nil {
 		panic(err)
 	}
-	logAccess(getMethodName(), r.Method, r.RequestURI, start)
+	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
+
