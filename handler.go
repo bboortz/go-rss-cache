@@ -18,23 +18,29 @@ var headerContentTypeValue string = "application/json; charset=UTF-8"
 /*
  * usage: curl -H "Content-Type: application/json" http://localhost:9090
  */
-func Index(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func IndexRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	w.WriteHeader(http.StatusOK)
-	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
-	fmt.Fprint(w, "{\"api\": \"go-router\", \"api-version\": \"0.1\"}")
+	var api Api = Api{ApiName: "go-router", ApiVersion: "0.1",}
+	if err := json.NewEncoder(w).Encode(api); err != nil {
+		panic(err)
+	}
+	logAccess(GetFunctionName(IndexRead), r.Method, r.RequestURI, start)
 }
 
 /*
  * usage: curl -H "Content-Type: application/json" http://localhost:9090
  */
-func Alive(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func AliveRead(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	w.WriteHeader(http.StatusOK)
-	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
-	fmt.Fprint(w, "{'alive': true}")
+	var alive Alive = Alive{Alive: true,}
+	if err := json.NewEncoder(w).Encode(alive); err != nil {
+		panic(err)
+	}
+	logAccess(GetFunctionName(IndexRead), r.Method, r.RequestURI, start)
 }
 
 /*
@@ -65,7 +71,7 @@ func ServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 	addService(service)
 
 	fmt.Fprintf(w, "{'service': %s, 'status': '%s'}", service.Name, "created")
-	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
+	logAccess(GetFunctionName(IndexRead), r.Method, r.RequestURI, start)
 
 }
 
@@ -92,7 +98,7 @@ func ServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		panic(err)
 	}
 
-	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
+	logAccess(GetFunctionName(IndexRead), r.Method, r.RequestURI, start)
 }
 
 /*
@@ -105,5 +111,5 @@ func ServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 	if err := json.NewEncoder(w).Encode(services); err != nil {
 		panic(err)
 	}
-	logAccess(GetFunctionName(Index), r.Method, r.RequestURI, start)
+	logAccess(GetFunctionName(IndexRead), r.Method, r.RequestURI, start)
 }
