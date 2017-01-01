@@ -2,11 +2,11 @@ package main
 
 import (
 	"github.com/julienschmidt/httprouter"
-	"httpcache"
+	"restcache"
 )
 
 func NewRouter() *httprouter.Router {
-	router := httpcache.NewRouter()
+	router := restcache.NewRouter()
 	router.PUT("/service", HandlerServiceCreate)
 	router.POST("/service", HandlerServiceCreate)
 	router.GET("/service/:name", HandlerServiceRead)

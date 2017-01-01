@@ -40,31 +40,6 @@ func genericRouterApiTestWithRequestBody(t *testing.T, method string, url string
 	return body
 }
 
-func TestRouterIndexRead(t *testing.T) {
-	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/", 200)
-
-	bodyResponse := Api{}
-	if err := json.Unmarshal(body, &bodyResponse); err != nil {
-		fmt.Println("ERROR: ", err)
-	}
-	assert.NotNil(bodyResponse)
-	assert.NotEmpty(bodyResponse.ApiName)
-	assert.NotEmpty(bodyResponse.ApiVersion)
-}
-
-func TestRouterAliveRead(t *testing.T) {
-	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/alive", 200)
-
-	bodyResponse := Alive{}
-	if err := json.Unmarshal(body, &bodyResponse); err != nil {
-		fmt.Println("ERROR: ", err)
-	}
-	assert.NotNil(bodyResponse)
-	assert.True(bodyResponse.Alive)
-}
-
 func TestRouterServiceRead(t *testing.T) {
 	assert := assert.New(t)
 	body := genericRouterApiTest(t, "GET", "/service/go-rnd", 200)
@@ -135,24 +110,6 @@ func TestRouterServiceCreateMethodNotAllowed(t *testing.T) {
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/service/go-rnd2", 405, strings.NewReader(requestBody))
-
-	bodyResponse := Service{}
-	if err := json.Unmarshal(body, &bodyResponse); err != nil {
-		fmt.Println("ERROR: ", err)
-	}
-	assert.NotNil(bodyResponse)
-	assert.Empty(bodyResponse.Id)
-	assert.Empty(bodyResponse.Name)
-	assert.False(bodyResponse.Completed)
-	assert.Empty(bodyResponse.Due)
-}
-
-func TestRouterServiceCreateNotFound(t *testing.T) {
-	assert := assert.New(t)
-	requestStruct := ServiceCreate{Name: "go-test"}
-	requestJson, _ := json.Marshal(requestStruct)
-	requestBody := string(requestJson)
-	body := genericRouterApiTestWithRequestBody(t, "POST", "/notfound", 404, strings.NewReader(requestBody))
 
 	bodyResponse := Service{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
