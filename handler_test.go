@@ -4,24 +4,23 @@ import (
 	"fmt"
 	"strings"
 	"testing"
-//	"reflect"
+	//	"reflect"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"encoding/json"
-//	"github.com/julienschmidt/httprouter"
-//	"github.com/davecgh/go-spew/spew"
+	//	"github.com/julienschmidt/httprouter"
+	//	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
 )
-
 
 func genericRouterApiTest(t *testing.T, method string, url string, expectedStatusCode int) []byte {
 	return genericRouterApiTestWithRequestBody(t, method, url, expectedStatusCode, nil)
 }
 
 func genericRouterApiTestWithRequestBody(t *testing.T, method string, url string, expectedStatusCode int, requestBody io.Reader) []byte {
-	assert := assert.New(t) 
+	assert := assert.New(t)
 	router := NewRouter()
 
 	req, err := http.NewRequest(method, url, requestBody)
@@ -106,18 +105,18 @@ func TestRouterServicesRead(t *testing.T) {
 	}
 	assert.NotNil(bodyResponse)
 	/*
-	assert.Empty(bodyResponse.Id)
-	assert.Empty(bodyResponse.Name)
-	assert.False(bodyResponse.Completed)
-	assert.Empty(bodyResponse.Due)
+		assert.Empty(bodyResponse.Id)
+		assert.Empty(bodyResponse.Name)
+		assert.False(bodyResponse.Completed)
+		assert.Empty(bodyResponse.Due)
 	*/
 }
 func TestRouterServiceCreate(t *testing.T) {
 	assert := assert.New(t)
 	requestStruct := ServiceCreate{Name: "go-test"}
 	requestJson, _ := json.Marshal(requestStruct)
-	requestBody := string( requestJson )
-	body := genericRouterApiTestWithRequestBody(t, "POST", "/service", 201, strings.NewReader(requestBody) )
+	requestBody := string(requestJson)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/service", 201, strings.NewReader(requestBody))
 
 	bodyResponse := Service{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -134,8 +133,8 @@ func TestRouterServiceCreateMethodNotAllowed(t *testing.T) {
 	assert := assert.New(t)
 	requestStruct := ServiceCreate{Name: "go-test"}
 	requestJson, _ := json.Marshal(requestStruct)
-	requestBody := string( requestJson )
-	body := genericRouterApiTestWithRequestBody(t, "POST", "/service/go-rnd2", 405, strings.NewReader(requestBody) )
+	requestBody := string(requestJson)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/service/go-rnd2", 405, strings.NewReader(requestBody))
 
 	bodyResponse := Service{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -147,14 +146,13 @@ func TestRouterServiceCreateMethodNotAllowed(t *testing.T) {
 	assert.False(bodyResponse.Completed)
 	assert.Empty(bodyResponse.Due)
 }
-
 
 func TestRouterServiceCreateNotFound(t *testing.T) {
 	assert := assert.New(t)
 	requestStruct := ServiceCreate{Name: "go-test"}
 	requestJson, _ := json.Marshal(requestStruct)
-	requestBody := string( requestJson )
-	body := genericRouterApiTestWithRequestBody(t, "POST", "/notfound", 404, strings.NewReader(requestBody) )
+	requestBody := string(requestJson)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/notfound", 404, strings.NewReader(requestBody))
 
 	bodyResponse := Service{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -166,6 +164,3 @@ func TestRouterServiceCreateNotFound(t *testing.T) {
 	assert.False(bodyResponse.Completed)
 	assert.Empty(bodyResponse.Due)
 }
-
-
-

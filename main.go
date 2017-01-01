@@ -1,8 +1,8 @@
 package main
 
 import (
-	"net/http"
 	"github.com/op/go-logging"
+	"net/http"
 )
 
 var log = logging.MustGetLogger("go-router")
@@ -12,6 +12,5 @@ func main() {
 	router := NewRouter()
 
 	log.Info("listening on: ", ipport)
-    log.Fatal(http.ListenAndServe(ipport, router))
+	log.Fatal(http.ListenAndServe(ipport, router))
 }
-

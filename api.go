@@ -1,12 +1,10 @@
 package main
 
-import (
-)
+import ()
 
 //type omit *struct{}
 
 type Api struct {
-	ApiName			string	`json:"api-name"`
-	ApiVersion		string	`json:"api-version"`
+	ApiName    string `json:"api-name"`
+	ApiVersion string `json:"api-version"`
 }
-

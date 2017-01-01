@@ -1,11 +1,9 @@
 package main
 
-import (
-)
+import ()
 
 //type omit *struct{}
 
 type Alive struct {
-	Alive			bool	`json:"alive"`
+	Alive bool `json:"alive"`
 }
-

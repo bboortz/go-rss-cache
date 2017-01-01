@@ -1,20 +1,18 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-	"time"
+	"github.com/julienschmidt/httprouter"
 	"io"
 	"io/ioutil"
-	"encoding/json"
 	"net/http"
-    "github.com/julienschmidt/httprouter"
-//	"github.com/davecgh/go-spew/spew"
+	"time"
+	//	"github.com/davecgh/go-spew/spew"
 )
-
 
 var headerContentTypeKey string = "Content-Type"
 var headerContentTypeValue string = "application/json; charset=UTF-8"
-
 
 func log2(fn http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -33,7 +31,7 @@ func HandlerIndexRead(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 	var statusCode int = http.StatusOK
 	var result Api
 
-	result = Api{ApiName: "go-router", ApiVersion: "0.1",}
+	result = Api{ApiName: "go-router", ApiVersion: "0.1"}
 
 	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(result); err != nil {
@@ -51,7 +49,7 @@ func HandlerAliveRead(w http.ResponseWriter, r *http.Request, _ httprouter.Param
 	var statusCode int = http.StatusOK
 	var result Alive
 
-	result = Alive{Alive: true,}
+	result = Alive{Alive: true}
 
 	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(result); err != nil {
@@ -81,10 +79,10 @@ func HandlerServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.
 
 	if err := json.Unmarshal(body, &service); err != nil {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = ServiceCreated{Service: service.Name, Status: "failed", Desc: err.Error(),}
-	} else if (service.Name == "") {
+		result = ServiceCreated{Service: service.Name, Status: "failed", Desc: err.Error()}
+	} else if service.Name == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = ServiceCreated{Service: service.Name, Status: "failed", Desc: "service name is empty",}
+		result = ServiceCreated{Service: service.Name, Status: "failed", Desc: "service name is empty"}
 	} else {
 		addService(service)
 		result = ServiceCreated{Service: service.Name, Status: "created", Desc: ""}
@@ -97,7 +95,6 @@ func HandlerServiceCreate(w http.ResponseWriter, r *http.Request, ps httprouter.
 	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 
-
 /*
  * usage: curl -H "Content-Type: application/json" http://localhost:9090/services/:name
  */
@@ -107,11 +104,10 @@ func HandlerServiceRead(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	var statusCode int = http.StatusOK
 	var result Service
 
-
 	serviceName := ps.ByName("name")
 	result = findService(serviceName)
 
-	if (result.Name == "") {
+	if result.Name == "" {
 		w.WriteHeader(http.StatusNotFound)
 		if err := json.NewEncoder(w).Encode(jsonErr{Code: http.StatusNotFound, Text: "Not Found"}); err != nil {
 			panic(err)
@@ -142,13 +138,11 @@ func HandlerServicesRead(w http.ResponseWriter, r *http.Request, ps httprouter.P
 	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 
-
-
 /*
  * error handler
  */
 
-func NotFound(w http.ResponseWriter, r *http.Request) { 
+func NotFound(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusNotFound
@@ -160,8 +154,7 @@ func NotFound(w http.ResponseWriter, r *http.Request) {
 }
 func NotFoundHandler() http.Handler { return http.HandlerFunc(NotFound) }
 
-
-func MethodNotAllowed(w http.ResponseWriter, r *http.Request) { 
+func MethodNotAllowed(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusMethodNotAllowed
@@ -172,4 +165,3 @@ func MethodNotAllowed(w http.ResponseWriter, r *http.Request) {
 	logAccess(getMethodName(), r.Method, r.RequestURI, statusCode, start)
 }
 func MethodNotAllowedHandler() http.Handler { return http.HandlerFunc(MethodNotAllowed) }
-

@@ -1,12 +1,10 @@
 package main
 
 import (
-	"testing"
 	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
-
-
 
 func TestNewRouter(t *testing.T) {
 	assert := assert.New(t)
@@ -17,4 +15,3 @@ func TestNewRouter(t *testing.T) {
 	})
 	spew.Dump(bench)
 }
-
