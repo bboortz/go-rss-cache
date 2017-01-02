@@ -16,10 +16,6 @@ import (
 	"rsslib"
 )
 
-type TestItemCreate struct {
-	Title string `json:"Title"`
-}
-
 func init() {
 	addItem(rsslib.RssItem{Channel: "TestChannel", Title: "TestTitle"})
 	addItem(rsslib.RssItem{Channel: "TestChannel", Title: "TestTitle2"})
@@ -95,6 +91,26 @@ func TestRouterItemsRead(t *testing.T) {
 		assert.Empty(bodyResponse.Due)
 	*/
 }
+
+func TestRouterItemsCountRead(t *testing.T) {
+	assert := assert.New(t)
+	body := genericRouterApiTest(t, "GET", "/itemscount", 200)
+
+	bodyResponse := RssItemCount{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyResponse)
+	assert.NotEmpty(bodyResponse.Count)
+	assert.Equal(2, bodyResponse.Count)
+	/*
+		assert.Empty(bodyResponse.Id)
+		assert.Empty(bodyResponse.Name)
+		assert.False(bodyResponse.Completed)
+		assert.Empty(bodyResponse.Due)
+	*/
+}
+
 func TestRouterItemCreate(t *testing.T) {
 	assert := assert.New(t)
 	requestStruct := rsslib.RssItem{Channel: "TestChannel2", Title: "go-test"}
@@ -113,7 +129,7 @@ func TestRouterItemCreate(t *testing.T) {
 
 func TestRouterItemCreateMethodNotAllowed(t *testing.T) {
 	assert := assert.New(t)
-	requestStruct := RssItemCreate{Channel: "TestChannel2", Title: "go-test"}
+	requestStruct := rsslib.RssItem{Channel: "TestChannel2", Title: "go-test"}
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item/go-rnd2", 405, strings.NewReader(requestBody))

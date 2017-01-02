@@ -8,11 +8,6 @@ type RssItemCount struct {
 	Count int `json:"Count"`
 }
 
-type RssItemCreate struct {
-	Channel string `json:"Channel"`
-	Title   string `json:"Title"`
-}
-
 type RssItemCreated struct {
 	Item   string `json:"Service"`
 	Status string `json:"Status"`
