@@ -99,7 +99,7 @@ func HandlerItemsRead(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 }
 
 /*
- * usage: curl -X HEAD -H "Content-Type: application/json" http://localhost:9090/items
+ * usage: curl -H "Content-Type: application/json" http://localhost:9090/itemscount
  */
 func HandlerItemsCount(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
