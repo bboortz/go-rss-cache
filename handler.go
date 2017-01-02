@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	//	"github.com/davecgh/go-spew/spew"
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"io/ioutil"
@@ -9,7 +10,6 @@ import (
 	"restcache"
 	"rsslib"
 	"time"
-	//	"github.com/davecgh/go-spew/spew"
 )
 
 var headerContentTypeKey string = "Content-Type"
@@ -90,6 +90,22 @@ func HandlerItemsRead(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusOK
 	var result rsslib.RssItems = rssItems
+
+	w.WriteHeader(statusCode)
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		panic(err)
+	}
+	restcache.LogAccess(r.Method, r.RequestURI, statusCode, start)
+}
+
+/*
+ * usage: curl -X HEAD -H "Content-Type: application/json" http://localhost:9090/items
+ */
+func HandlerItemsCount(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	start := time.Now()
+	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	var statusCode int = http.StatusOK
+	result := RssItemCount{Count: len(rssItems)}
 
 	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(result); err != nil {

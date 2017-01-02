@@ -11,6 +11,7 @@ func NewRouter() *httprouter.Router {
 	router.POST("/item", HandlerItemCreate)
 	router.GET("/item/:name", HandlerItemRead)
 	router.GET("/items", HandlerItemsRead)
+	router.GET("/itemscount", HandlerItemsCount)
 
 	return router
 }

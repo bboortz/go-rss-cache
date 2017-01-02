@@ -4,6 +4,10 @@ import (
 	"rsslib"
 )
 
+type RssItemCount struct {
+	Count int `json:"Count"`
+}
+
 type RssItemCreate struct {
 	Channel string `json:"Channel"`
 	Title   string `json:"Title"`
