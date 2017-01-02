@@ -52,7 +52,7 @@ func genericRouterApiTestWithRequestBody(t *testing.T, method string, url string
 
 func TestRouterItemRead(t *testing.T) {
 	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/service/TestTitle", 200)
+	body := genericRouterApiTest(t, "GET", "/item/TestTitle", 200)
 
 	bodyResponse := rsslib.RssItem{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -66,7 +66,7 @@ func TestRouterItemRead(t *testing.T) {
 
 func TestRouterItemReadWrongService(t *testing.T) {
 	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/service/TestTitle100", 404)
+	body := genericRouterApiTest(t, "GET", "/item/TestTitle100", 404)
 
 	bodyResponse := rsslib.RssItem{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -81,7 +81,7 @@ func TestRouterItemReadWrongService(t *testing.T) {
 
 func TestRouterItemsRead(t *testing.T) {
 	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/services", 200)
+	body := genericRouterApiTest(t, "GET", "/items", 200)
 
 	bodyResponse := rsslib.RssItem{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -100,7 +100,7 @@ func TestRouterItemCreate(t *testing.T) {
 	requestStruct := rsslib.RssItem{Channel: "TestChannel2", Title: "go-test"}
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
-	body := genericRouterApiTestWithRequestBody(t, "POST", "/service", 201, strings.NewReader(requestBody))
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 201, strings.NewReader(requestBody))
 
 	bodyResponse := RssItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -116,7 +116,7 @@ func TestRouterItemCreateMethodNotAllowed(t *testing.T) {
 	requestStruct := RssItemCreate{Channel: "TestChannel2", Title: "go-test"}
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
-	body := genericRouterApiTestWithRequestBody(t, "POST", "/service/go-rnd2", 405, strings.NewReader(requestBody))
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/item/go-rnd2", 405, strings.NewReader(requestBody))
 
 	bodyResponse := RssItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {

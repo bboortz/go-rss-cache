@@ -16,7 +16,7 @@ var headerContentTypeKey string = "Content-Type"
 var headerContentTypeValue string = "application/json; charset=UTF-8"
 
 /*
- * usage: curl -H "Content-Type: application/json" -d '{"name":"go-testapi"}' http://localhost:9090/service
+ * usage: curl -H "Content-Type: application/json" -d '{"name":"go-testapi"}' http://localhost:9090/item
  */
 func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
@@ -56,7 +56,7 @@ func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 }
 
 /*
- * usage: curl -H "Content-Type: application/json" http://localhost:9090/services/:name
+ * usage: curl -H "Content-Type: application/json" http://localhost:9090/item/:name
  */
 func HandlerItemRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
@@ -83,7 +83,7 @@ func HandlerItemRead(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 }
 
 /*
- * usage: curl -H "Content-Type: application/json" http://localhost:9090/services
+ * usage: curl -H "Content-Type: application/json" http://localhost:9090/items
  */
 func HandlerItemsRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
