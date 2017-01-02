@@ -1,24 +1,34 @@
 package main
 
 import (
-	"fmt"
-	"strings"
-	"testing"
-	//	"reflect"
 	"encoding/json"
+	"fmt"
+	//	"github.com/davecgh/go-spew/spew"
+	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	//	"github.com/julienschmidt/httprouter"
-	//	"github.com/davecgh/go-spew/spew"
-	"github.com/stretchr/testify/assert"
 	"rsslib"
+	"strings"
+	"testing"
 )
 
+type WrongRssItem struct {
+	Id2          int    `json:"Id"`
+	Uuid2        string `json:"Uuid"`
+	Channel2     string `json:"Channel"`
+	Title2       string `json:"Title"`
+	Link2        string `json:"Link"`
+	Description2 string `json:"Description"`
+	Thumbnail2   string `json:"Thumbnail"`
+	PublishDate2 string `json:"PublishDate"`
+	UpdateDate2  string `json:"UpdateDate"`
+}
+
 func init() {
-	addItem(rsslib.RssItem{Channel: "TestChannel", Title: "TestTitle"})
-	addItem(rsslib.RssItem{Channel: "TestChannel", Title: "TestTitle2"})
+	addItem(rsslib.RssItem{Id: 1, Uuid: "68e9e42d-a0ba-5a4c-591b-000000000001", Channel: "TestChannel", Title: "testtitle1", Link: "http://localhost"})
+	addItem(rsslib.RssItem{Id: 1, Uuid: "68e9e42d-a0ba-5a4c-591b-000000000002", Channel: "TestChannel", Title: "testtitle2", Link: "http://localhost"})
 }
 
 func genericRouterApiTest(t *testing.T, method string, url string, expectedStatusCode int) []byte {
@@ -48,7 +58,7 @@ func genericRouterApiTestWithRequestBody(t *testing.T, method string, url string
 
 func TestRouterItemRead(t *testing.T) {
 	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/item/TestTitle", 200)
+	body := genericRouterApiTest(t, "GET", "/item/68e9e42d-a0ba-5a4c-591b-000000000001", 200)
 
 	bodyResponse := rsslib.RssItem{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -56,13 +66,14 @@ func TestRouterItemRead(t *testing.T) {
 	}
 	assert.NotNil(bodyResponse)
 	assert.NotEmpty(bodyResponse.Id)
+	assert.NotEmpty(bodyResponse.Uuid)
 	assert.NotEmpty(bodyResponse.Channel)
 	assert.NotEmpty(bodyResponse.Title)
 }
 
-func TestRouterItemReadWrongService(t *testing.T) {
+func TestRouterItemReadWrongItem(t *testing.T) {
 	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/item/TestTitle100", 404)
+	body := genericRouterApiTest(t, "GET", "/item/68e9e42d-a0ba-5a4c-591b-unknownuud99", 404)
 
 	bodyResponse := rsslib.RssItem{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
@@ -70,6 +81,7 @@ func TestRouterItemReadWrongService(t *testing.T) {
 	}
 	assert.NotNil(bodyResponse)
 	assert.Empty(bodyResponse.Id)
+	assert.Empty(bodyResponse.Uuid)
 	assert.Empty(bodyResponse.Channel)
 	assert.Empty(bodyResponse.Title)
 
@@ -79,11 +91,12 @@ func TestRouterItemsRead(t *testing.T) {
 	assert := assert.New(t)
 	body := genericRouterApiTest(t, "GET", "/items", 200)
 
-	bodyResponse := rsslib.RssItem{}
+	bodyResponse := rsslib.RssItems{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
 	assert.NotNil(bodyResponse)
+	assert.Equal(2, len(bodyResponse))
 	/*
 		assert.Empty(bodyResponse.Id)
 		assert.Empty(bodyResponse.Name)
@@ -102,7 +115,7 @@ func TestRouterItemsCountRead(t *testing.T) {
 	}
 	assert.NotNil(bodyResponse)
 	assert.NotEmpty(bodyResponse.Count)
-	assert.Equal(2, bodyResponse.Count)
+	assert.Equal(int64(2), bodyResponse.Count)
 	/*
 		assert.Empty(bodyResponse.Id)
 		assert.Empty(bodyResponse.Name)
@@ -113,7 +126,7 @@ func TestRouterItemsCountRead(t *testing.T) {
 
 func TestRouterItemCreate(t *testing.T) {
 	assert := assert.New(t)
-	requestStruct := rsslib.RssItem{Channel: "TestChannel2", Title: "go-test"}
+	requestStruct := rsslib.RssItem{Uuid: "68e9e42d-a0ba-5a4c-591b-000000000004", Channel: "TestChannel2", Title: "testtitle3", Link: "http://localhost"}
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 201, strings.NewReader(requestBody))
@@ -127,9 +140,91 @@ func TestRouterItemCreate(t *testing.T) {
 	assert.NotEmpty(bodyResponse.Status)
 }
 
+func TestRouterItemCreateWithoutUuid(t *testing.T) {
+	assert := assert.New(t)
+	requestStruct := rsslib.RssItem{Uuid: "", Channel: "TestChannel2", Title: "testtitle3", Link: "http://localhost"}
+	requestJson, _ := json.Marshal(requestStruct)
+	requestBody := string(requestJson)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
+
+	bodyResponse := RssItemCreated{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyResponse)
+	assert.NotEmpty(bodyResponse.Item)
+	assert.NotEmpty(bodyResponse.Status)
+	assert.NotEmpty(bodyResponse.Desc)
+}
+
+func TestRouterItemCreateWithoutChannel(t *testing.T) {
+	assert := assert.New(t)
+	requestStruct := rsslib.RssItem{Uuid: "68e9e42d-a0ba-5a4c-591b-000000000004", Channel: "", Title: "testtitle3", Link: "http://localhost"}
+	requestJson, _ := json.Marshal(requestStruct)
+	requestBody := string(requestJson)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
+
+	bodyResponse := RssItemCreated{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyResponse)
+	assert.NotEmpty(bodyResponse.Item)
+	assert.NotEmpty(bodyResponse.Status)
+	assert.NotEmpty(bodyResponse.Desc)
+}
+
+func TestRouterItemCreateWithoutTitle(t *testing.T) {
+	assert := assert.New(t)
+	requestStruct := rsslib.RssItem{Uuid: "68e9e42d-a0ba-5a4c-591b-000000000004", Channel: "TestChannel2", Title: "", Link: "http://localhost"}
+	requestJson, _ := json.Marshal(requestStruct)
+	requestBody := string(requestJson)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
+
+	bodyResponse := RssItemCreated{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyResponse)
+	assert.NotEmpty(bodyResponse.Item)
+	assert.NotEmpty(bodyResponse.Status)
+	assert.NotEmpty(bodyResponse.Desc)
+}
+
+func TestRouterItemCreateWithoutLink(t *testing.T) {
+	assert := assert.New(t)
+	requestStruct := rsslib.RssItem{Uuid: "68e9e42d-a0ba-5a4c-591b-000000000004", Channel: "TestChannel2", Title: "testtitle3", Link: ""}
+	requestJson, _ := json.Marshal(requestStruct)
+	requestBody := string(requestJson)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
+
+	bodyResponse := RssItemCreated{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyResponse)
+	assert.NotEmpty(bodyResponse.Item)
+	assert.NotEmpty(bodyResponse.Status)
+	assert.NotEmpty(bodyResponse.Desc)
+}
+
+func TestRouterItemCreateNotJson(t *testing.T) {
+	assert := assert.New(t)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader("id: test"))
+
+	bodyResponse := RssItemCreated{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyResponse)
+	assert.NotEmpty(bodyResponse.Item)
+	assert.NotEmpty(bodyResponse.Status)
+	assert.NotEmpty(bodyResponse.Desc)
+}
+
 func TestRouterItemCreateMethodNotAllowed(t *testing.T) {
 	assert := assert.New(t)
-	requestStruct := rsslib.RssItem{Channel: "TestChannel2", Title: "go-test"}
+	requestStruct := rsslib.RssItem{Id: 1, Uuid: "68e9e42d-a0ba-5a4c-591b-000000000004", Channel: "TestChannel2", Title: "testtitle4", Link: "http://localhost"}
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item/go-rnd2", 405, strings.NewReader(requestBody))

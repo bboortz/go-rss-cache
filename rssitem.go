@@ -5,7 +5,7 @@ import (
 )
 
 type RssItemCount struct {
-	Count int `json:"Count"`
+	Count int64 `json:"Count"`
 }
 
 type RssItemCreated struct {
@@ -25,9 +25,9 @@ func addItem(s rsslib.RssItem) rsslib.RssItem {
 	return s
 }
 
-func findItem(title string) rsslib.RssItem {
+func findItem(uuid string) rsslib.RssItem {
 	for _, s := range rssItems {
-		if s.Title == title {
+		if s.Uuid == uuid {
 			return s
 		}
 	}
