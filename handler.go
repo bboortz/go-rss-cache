@@ -24,7 +24,7 @@ func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusCreated
-	var result RssItemCreated
+	var result ItemCreated
 
 	var item rsslib.RssItem
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -40,22 +40,22 @@ func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 	if err := json.Unmarshal(body, &item); err != nil {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = RssItemCreated{Item: "no uuid", Status: "failed", Desc: err.Error()}
+		result = ItemCreated{Item: "no uuid", Status: "failed", Desc: err.Error()}
 	} else if item.Uuid == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = RssItemCreated{Item: item.Title, Status: "failed", Desc: "uuid is empty"}
+		result = ItemCreated{Item: item.Title, Status: "failed", Desc: "uuid is empty"}
 	} else if item.Channel == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = RssItemCreated{Item: item.Uuid, Status: "failed", Desc: "channel is empty"}
+		result = ItemCreated{Item: item.Uuid, Status: "failed", Desc: "channel is empty"}
 	} else if item.Title == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = RssItemCreated{Item: item.Uuid, Status: "failed", Desc: "title is empty"}
+		result = ItemCreated{Item: item.Uuid, Status: "failed", Desc: "title is empty"}
 	} else if item.Link == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = RssItemCreated{Item: item.Uuid, Status: "failed", Desc: "link is empty"}
+		result = ItemCreated{Item: item.Uuid, Status: "failed", Desc: "link is empty"}
 	} else {
 		addItem(item)
-		result = RssItemCreated{Item: item.Uuid, Status: "created", Desc: strconv.FormatInt(item.Id, 10)}
+		result = ItemCreated{Item: item.Uuid, Status: "created", Desc: strconv.FormatUint(item.Id, 10)}
 	}
 
 	w.WriteHeader(statusCode)
@@ -115,7 +115,7 @@ func HandlerItemsCount(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusOK
-	result := RssItemCount{Count: rssItems.Len()}
+	result := ItemCount{Count: rssItems.Len()}
 
 	w.WriteHeader(statusCode)
 	if err := json.NewEncoder(w).Encode(result); err != nil {

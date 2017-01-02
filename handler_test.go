@@ -7,28 +7,31 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"rsslib"
 	"strings"
 	"testing"
+	"time"
 )
 
-type WrongRssItem struct {
-	Id2          int    `json:"Id"`
-	Uuid2        string `json:"Uuid"`
-	Channel2     string `json:"Channel"`
-	Title2       string `json:"Title"`
-	Link2        string `json:"Link"`
-	Description2 string `json:"Description"`
-	Thumbnail2   string `json:"Thumbnail"`
-	PublishDate2 string `json:"PublishDate"`
-	UpdateDate2  string `json:"UpdateDate"`
+func randomString(l int) string {
+	bytes := make([]byte, l)
+	for i := 0; i < l; i++ {
+		bytes[i] = byte(randInt(65, 90))
+	}
+	return string(bytes)
+}
+
+func randInt(min int, max int) int {
+	return min + rand.Intn(max-min)
 }
 
 func init() {
-	addItem(rsslib.RssItem{Id: 1, Uuid: "68e9e42d-a0ba-5a4c-591b-000000000001", Channel: "TestChannel", Title: "testtitle1", Link: "http://localhost"})
-	addItem(rsslib.RssItem{Id: 1, Uuid: "68e9e42d-a0ba-5a4c-591b-000000000002", Channel: "TestChannel", Title: "testtitle2", Link: "http://localhost"})
+	rand.Seed(time.Now().UTC().UnixNano())
+	addItem(rsslib.RssItem{Uuid: "68e9e42d-a0ba-5a4c-591b-000000000001", Channel: "TestChannel", Title: "testtitle1", Link: "http://localhost"})
+	addItem(rsslib.RssItem{Uuid: "68e9e42d-a0ba-5a4c-591b-000000000002", Channel: "TestChannel", Title: "testtitle2", Link: "http://localhost"})
 }
 
 func genericRouterApiTest(t *testing.T, method string, url string, expectedStatusCode int) []byte {
@@ -109,13 +112,13 @@ func TestRouterItemsCountRead(t *testing.T) {
 	assert := assert.New(t)
 	body := genericRouterApiTest(t, "GET", "/itemscount", 200)
 
-	bodyResponse := RssItemCount{}
+	bodyResponse := ItemCount{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
 	assert.NotNil(bodyResponse)
 	assert.NotEmpty(bodyResponse.Count)
-	assert.Equal(int64(2), bodyResponse.Count)
+	assert.Equal(uint64(2), bodyResponse.Count)
 	/*
 		assert.Empty(bodyResponse.Id)
 		assert.Empty(bodyResponse.Name)
@@ -131,7 +134,27 @@ func TestRouterItemCreate(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 201, strings.NewReader(requestBody))
 
-	bodyResponse := RssItemCreated{}
+	bodyResponse := ItemCreated{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyResponse)
+	assert.NotEmpty(bodyResponse.Item)
+	assert.NotEmpty(bodyResponse.Status)
+}
+
+func TestRouterItemCreateRandom(t *testing.T) {
+	assert := assert.New(t)
+	var uuid string = randomString(8) + "-" + randomString(4) + "-" + randomString(4) + "-" + randomString(4) + "-" + randomString(12)
+	var channel string = "testchannel" + randomString(10)
+	var title string = "testtitle" + randomString(10)
+	var link string = "http://" + randomString(10)
+	requestStruct := rsslib.RssItem{Uuid: uuid, Channel: channel, Title: title, Link: link}
+	requestJson, _ := json.Marshal(requestStruct)
+	requestBody := string(requestJson)
+	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 201, strings.NewReader(requestBody))
+
+	bodyResponse := ItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -147,7 +170,7 @@ func TestRouterItemCreateWithoutUuid(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
 
-	bodyResponse := RssItemCreated{}
+	bodyResponse := ItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -164,7 +187,7 @@ func TestRouterItemCreateWithoutChannel(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
 
-	bodyResponse := RssItemCreated{}
+	bodyResponse := ItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -181,7 +204,7 @@ func TestRouterItemCreateWithoutTitle(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
 
-	bodyResponse := RssItemCreated{}
+	bodyResponse := ItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -198,7 +221,7 @@ func TestRouterItemCreateWithoutLink(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
 
-	bodyResponse := RssItemCreated{}
+	bodyResponse := ItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -212,7 +235,7 @@ func TestRouterItemCreateNotJson(t *testing.T) {
 	assert := assert.New(t)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader("id: test"))
 
-	bodyResponse := RssItemCreated{}
+	bodyResponse := ItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -229,7 +252,7 @@ func TestRouterItemCreateMethodNotAllowed(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item/go-rnd2", 405, strings.NewReader(requestBody))
 
-	bodyResponse := RssItemCreated{}
+	bodyResponse := ItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}

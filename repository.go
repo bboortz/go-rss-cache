@@ -4,18 +4,18 @@ import (
 	"rsslib"
 )
 
-type RssItemCount struct {
-	Count int64 `json:"Count"`
+type ItemCount struct {
+	Count uint64 `json:"Count"`
 }
 
-type RssItemCreated struct {
+type ItemCreated struct {
 	Item   string `json:"Service"`
 	Status string `json:"Status"`
 	Desc   string `json:"Desc"`
 }
 
 var rssItems rsslib.RssItems
-var currentId int64 = 0
+var currentId uint64 = 0
 
 func addItem(s rsslib.RssItem) rsslib.RssItem {
 	currentId += 1
@@ -31,6 +31,6 @@ func findItem(uuid string) rsslib.RssItem {
 			return s
 		}
 	}
-	// return empty Todo if not found
+	// return empty item if not found
 	return rsslib.RssItem{}
 }
