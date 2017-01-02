@@ -5,6 +5,7 @@ import (
 	"fmt"
 	//"github.com/davecgh/go-spew/spew"
 	"github.com/bboortz/go-rsslib"
+	"github.com/bboortz/go-utils"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"
@@ -15,18 +16,6 @@ import (
 	"testing"
 	"time"
 )
-
-func randomString(l int) string {
-	bytes := make([]byte, l)
-	for i := 0; i < l; i++ {
-		bytes[i] = byte(randInt(65, 90))
-	}
-	return string(bytes)
-}
-
-func randInt(min int, max int) int {
-	return min + rand.Intn(max-min)
-}
 
 func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
@@ -133,10 +122,10 @@ func TestRouterItemCreate(t *testing.T) {
 
 func TestRouterItemCreateRandom(t *testing.T) {
 	assert := assert.New(t)
-	var uuid string = randomString(8) + "-" + randomString(4) + "-" + randomString(4) + "-" + randomString(4) + "-" + randomString(12)
-	var channel string = "testchannel" + randomString(10)
-	var title string = "testtitle" + randomString(10)
-	var link string = "http://" + randomString(10)
+	var uuid string = utils.RandomString(8) + "-" + utils.RandomString(4) + "-" + utils.RandomString(4) + "-" + utils.RandomString(4) + "-" + utils.RandomString(12)
+	var channel string = "testchannel" + utils.RandomString(10)
+	var title string = "testtitle" + utils.RandomString(10)
+	var link string = "http://" + utils.RandomString(10)
 	requestStruct := rsslib.RssItem{Uuid: uuid, Channel: channel, Title: title, Link: link}
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
