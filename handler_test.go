@@ -13,7 +13,17 @@ import (
 	//	"github.com/julienschmidt/httprouter"
 	//	"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
+	"rsslib"
 )
+
+type TestItemCreate struct {
+	Title string `json:"Title"`
+}
+
+func init() {
+	addItem(rsslib.RssItem{Channel: "TestChannel", Title: "TestTitle"})
+	addItem(rsslib.RssItem{Channel: "TestChannel", Title: "TestTitle2"})
+}
 
 func genericRouterApiTest(t *testing.T, method string, url string, expectedStatusCode int) []byte {
 	return genericRouterApiTestWithRequestBody(t, method, url, expectedStatusCode, nil)
@@ -40,41 +50,40 @@ func genericRouterApiTestWithRequestBody(t *testing.T, method string, url string
 	return body
 }
 
-func TestRouterServiceRead(t *testing.T) {
+func TestRouterItemRead(t *testing.T) {
 	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/service/go-rnd", 200)
+	body := genericRouterApiTest(t, "GET", "/service/TestTitle", 200)
 
-	bodyResponse := Service{}
+	bodyResponse := rsslib.RssItem{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
 	assert.NotNil(bodyResponse)
 	assert.NotEmpty(bodyResponse.Id)
-	assert.NotEmpty(bodyResponse.Name)
-	assert.False(bodyResponse.Completed)
-	assert.Empty(bodyResponse.Due)
+	assert.NotEmpty(bodyResponse.Channel)
+	assert.NotEmpty(bodyResponse.Title)
 }
 
-func TestRouterServiceReadWrongService(t *testing.T) {
+func TestRouterItemReadWrongService(t *testing.T) {
 	assert := assert.New(t)
-	body := genericRouterApiTest(t, "GET", "/service/go-rnd2", 404)
+	body := genericRouterApiTest(t, "GET", "/service/TestTitle100", 404)
 
-	bodyResponse := Service{}
+	bodyResponse := rsslib.RssItem{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
 	assert.NotNil(bodyResponse)
 	assert.Empty(bodyResponse.Id)
-	assert.Empty(bodyResponse.Name)
-	assert.False(bodyResponse.Completed)
-	assert.Empty(bodyResponse.Due)
+	assert.Empty(bodyResponse.Channel)
+	assert.Empty(bodyResponse.Title)
+
 }
 
-func TestRouterServicesRead(t *testing.T) {
+func TestRouterItemsRead(t *testing.T) {
 	assert := assert.New(t)
 	body := genericRouterApiTest(t, "GET", "/services", 200)
 
-	bodyResponse := Services{}
+	bodyResponse := rsslib.RssItem{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -86,38 +95,34 @@ func TestRouterServicesRead(t *testing.T) {
 		assert.Empty(bodyResponse.Due)
 	*/
 }
-func TestRouterServiceCreate(t *testing.T) {
+func TestRouterItemCreate(t *testing.T) {
 	assert := assert.New(t)
-	requestStruct := ServiceCreate{Name: "go-test"}
+	requestStruct := rsslib.RssItem{Channel: "TestChannel2", Title: "go-test"}
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/service", 201, strings.NewReader(requestBody))
 
-	bodyResponse := Service{}
+	bodyResponse := RssItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
 	assert.NotNil(bodyResponse)
-	assert.Empty(bodyResponse.Id)
-	assert.Empty(bodyResponse.Name)
-	assert.False(bodyResponse.Completed)
-	assert.Empty(bodyResponse.Due)
+	assert.NotEmpty(bodyResponse.Item)
+	assert.NotEmpty(bodyResponse.Status)
 }
 
-func TestRouterServiceCreateMethodNotAllowed(t *testing.T) {
+func TestRouterItemCreateMethodNotAllowed(t *testing.T) {
 	assert := assert.New(t)
-	requestStruct := ServiceCreate{Name: "go-test"}
+	requestStruct := RssItemCreate{Channel: "TestChannel2", Title: "go-test"}
 	requestJson, _ := json.Marshal(requestStruct)
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/service/go-rnd2", 405, strings.NewReader(requestBody))
 
-	bodyResponse := Service{}
+	bodyResponse := RssItemCreated{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
 	assert.NotNil(bodyResponse)
-	assert.Empty(bodyResponse.Id)
-	assert.Empty(bodyResponse.Name)
-	assert.False(bodyResponse.Completed)
-	assert.Empty(bodyResponse.Due)
+	assert.Empty(bodyResponse.Item)
+	assert.Empty(bodyResponse.Status)
 }

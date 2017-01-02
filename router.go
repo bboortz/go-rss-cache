@@ -7,10 +7,10 @@ import (
 
 func NewRouter() *httprouter.Router {
 	router := restcache.NewRouter()
-	router.PUT("/service", HandlerServiceCreate)
-	router.POST("/service", HandlerServiceCreate)
-	router.GET("/service/:name", HandlerServiceRead)
-	router.GET("/services", HandlerServicesRead)
+	router.PUT("/service", HandlerItemCreate)
+	router.POST("/service", HandlerItemCreate)
+	router.GET("/service/:name", HandlerItemRead)
+	router.GET("/services", HandlerItemsRead)
 
 	return router
 }
