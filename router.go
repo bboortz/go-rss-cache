@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/bboortz/go-restcache"
 	"github.com/julienschmidt/httprouter"
-	"restcache"
 )
 
 func NewRouter() *httprouter.Router {

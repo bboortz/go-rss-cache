@@ -3,12 +3,12 @@ package main
 import (
 	"encoding/json"
 	//"github.com/davecgh/go-spew/spew"
+	"github.com/bboortz/go-restcache"
+	"github.com/bboortz/go-rsslib"
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"restcache"
-	"rsslib"
 	"time"
 )
 

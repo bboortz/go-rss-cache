@@ -2,7 +2,7 @@ package main
 
 import (
 	//	"github.com/davecgh/go-spew/spew"
-	"rsslib"
+	"github.com/bboortz/go-rsslib"
 	"strconv"
 	"time"
 )

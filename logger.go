@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/bboortz/go-rsslib"
 	"github.com/op/go-logging"
-	"rsslib"
 )
 
 var log = logging.MustGetLogger("rss-cache")
