@@ -24,7 +24,7 @@ func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
 	var statusCode int = http.StatusCreated
-	var result ItemCreated
+	var result ItemCUDResult
 
 	var item rsslib.RssItem
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -40,22 +40,27 @@ func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 
 	if err := json.Unmarshal(body, &item); err != nil {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = ItemCreated{Item: "no uuid", Status: "failed", Desc: err.Error()}
+		result = ItemCUDResult{Item: "no uuid", Status: "failed", Desc: err.Error()}
 	} else if item.Uuid == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = ItemCreated{Item: item.Title, Status: "failed", Desc: "uuid is empty"}
+		result = ItemCUDResult{Item: item.Title, Status: "failed", Desc: "uuid is empty"}
 	} else if item.Channel == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = ItemCreated{Item: item.Uuid, Status: "failed", Desc: "channel is empty"}
+		result = ItemCUDResult{Item: item.Uuid, Status: "failed", Desc: "channel is empty"}
 	} else if item.Title == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = ItemCreated{Item: item.Uuid, Status: "failed", Desc: "title is empty"}
+		result = ItemCUDResult{Item: item.Uuid, Status: "failed", Desc: "title is empty"}
 	} else if item.Link == "" {
 		statusCode = 422 // 422 - Unprocessable Entity
-		result = ItemCreated{Item: item.Uuid, Status: "failed", Desc: "link is empty"}
+		result = ItemCUDResult{Item: item.Uuid, Status: "failed", Desc: "link is empty"}
 	} else {
-		addItem(item)
-		result = ItemCreated{Item: item.Uuid, Status: "created", Desc: strconv.FormatUint(item.Id, 10)}
+		searchItem := findItem(item.Uuid)
+		if searchItem.Uuid == "" {
+			result = ItemCUDResult{Item: item.Uuid, Status: "created", Desc: strconv.FormatUint(item.Id, 10)}
+		} else {
+			addItem(item)
+			result = ItemCUDResult{Item: item.Uuid, Status: "updated", Desc: strconv.FormatUint(item.Id, 10)}
+		}
 	}
 
 	w.WriteHeader(statusCode)

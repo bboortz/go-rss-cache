@@ -134,7 +134,7 @@ func TestRouterItemCreate(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 201, strings.NewReader(requestBody))
 
-	bodyResponse := ItemCreated{}
+	bodyResponse := ItemCUDResult{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -154,7 +154,7 @@ func TestRouterItemCreateRandom(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 201, strings.NewReader(requestBody))
 
-	bodyResponse := ItemCreated{}
+	bodyResponse := ItemCUDResult{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -170,7 +170,7 @@ func TestRouterItemCreateWithoutUuid(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
 
-	bodyResponse := ItemCreated{}
+	bodyResponse := ItemCUDResult{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -187,7 +187,7 @@ func TestRouterItemCreateWithoutChannel(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
 
-	bodyResponse := ItemCreated{}
+	bodyResponse := ItemCUDResult{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -204,7 +204,7 @@ func TestRouterItemCreateWithoutTitle(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
 
-	bodyResponse := ItemCreated{}
+	bodyResponse := ItemCUDResult{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -221,7 +221,7 @@ func TestRouterItemCreateWithoutLink(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader(requestBody))
 
-	bodyResponse := ItemCreated{}
+	bodyResponse := ItemCUDResult{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -235,7 +235,7 @@ func TestRouterItemCreateNotJson(t *testing.T) {
 	assert := assert.New(t)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item", 422, strings.NewReader("id: test"))
 
-	bodyResponse := ItemCreated{}
+	bodyResponse := ItemCUDResult{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}
@@ -252,7 +252,7 @@ func TestRouterItemCreateMethodNotAllowed(t *testing.T) {
 	requestBody := string(requestJson)
 	body := genericRouterApiTestWithRequestBody(t, "POST", "/item/go-rnd2", 405, strings.NewReader(requestBody))
 
-	bodyResponse := ItemCreated{}
+	bodyResponse := ItemCUDResult{}
 	if err := json.Unmarshal(body, &bodyResponse); err != nil {
 		fmt.Println("ERROR: ", err)
 	}

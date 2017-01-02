@@ -8,8 +8,8 @@ type ItemCount struct {
 	Count uint64 `json:"Count"`
 }
 
-type ItemCreated struct {
-	Item   string `json:"Service"`
+type ItemCUDResult struct {
+	Item   string `json:"Item"`
 	Status string `json:"Status"`
 	Desc   string `json:"Desc"`
 }
