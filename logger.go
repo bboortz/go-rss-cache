@@ -8,5 +8,13 @@ import (
 var log = logging.MustGetLogger("rss-cache")
 
 func logItemAdded(s rsslib.RssItem) {
-	log.Infof("%s\titem added: %d - %s - %s - %s ", log.Module, s.Id, s.Uuid, s.Channel, s.Title)
+	logItemAction(s, "added")
+}
+
+func logItemUpdated(s rsslib.RssItem) {
+	logItemAction(s, "updated")
+}
+
+func logItemAction(s rsslib.RssItem, action string) {
+	log.Infof("%s\titem %s: %d - %s - %s - %s ", log.Module, action, s.Id, s.Uuid, s.Channel, s.Title)
 }

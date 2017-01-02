@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	//	"github.com/davecgh/go-spew/spew"
+	//"github.com/davecgh/go-spew/spew"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"io/ioutil"
@@ -68,7 +68,6 @@ func TestRouterItemRead(t *testing.T) {
 		fmt.Println("ERROR: ", err)
 	}
 	assert.NotNil(bodyResponse)
-	assert.NotEmpty(bodyResponse.Id)
 	assert.NotEmpty(bodyResponse.Uuid)
 	assert.NotEmpty(bodyResponse.Channel)
 	assert.NotEmpty(bodyResponse.Title)
@@ -100,12 +99,6 @@ func TestRouterItemsRead(t *testing.T) {
 	}
 	assert.NotNil(bodyResponse)
 	assert.Equal(2, len(bodyResponse))
-	/*
-		assert.Empty(bodyResponse.Id)
-		assert.Empty(bodyResponse.Name)
-		assert.False(bodyResponse.Completed)
-		assert.Empty(bodyResponse.Due)
-	*/
 }
 
 func TestRouterItemsCountRead(t *testing.T) {
@@ -119,12 +112,6 @@ func TestRouterItemsCountRead(t *testing.T) {
 	assert.NotNil(bodyResponse)
 	assert.NotEmpty(bodyResponse.Count)
 	assert.Equal(uint64(2), bodyResponse.Count)
-	/*
-		assert.Empty(bodyResponse.Id)
-		assert.Empty(bodyResponse.Name)
-		assert.False(bodyResponse.Completed)
-		assert.Empty(bodyResponse.Due)
-	*/
 }
 
 func TestRouterItemCreate(t *testing.T) {
@@ -141,6 +128,7 @@ func TestRouterItemCreate(t *testing.T) {
 	assert.NotNil(bodyResponse)
 	assert.NotEmpty(bodyResponse.Item)
 	assert.NotEmpty(bodyResponse.Status)
+	assert.Equal("created", bodyResponse.Status)
 }
 
 func TestRouterItemCreateRandom(t *testing.T) {
@@ -161,6 +149,156 @@ func TestRouterItemCreateRandom(t *testing.T) {
 	assert.NotNil(bodyResponse)
 	assert.NotEmpty(bodyResponse.Item)
 	assert.NotEmpty(bodyResponse.Status)
+	assert.Equal("created", bodyResponse.Status)
+}
+
+func TestRouterItemUpdate1(t *testing.T) {
+	assert := assert.New(t)
+	// count items initially
+	body := genericRouterApiTest(t, "GET", "/itemscount", 200)
+
+	bodyCountResponse := ItemCount{}
+	if err := json.Unmarshal(body, &bodyCountResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	var initialCount uint64 = bodyCountResponse.Count
+
+	// check id initially
+	body = genericRouterApiTest(t, "GET", "/item/68e9e42d-a0ba-5a4c-591b-000000000001", 200)
+
+	bodyReadResponse := rsslib.RssItem{}
+	if err := json.Unmarshal(body, &bodyReadResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	var initialId uint64 = bodyReadResponse.Id
+
+	// create duplicate
+	var updateDate string = time.Now().UTC().String()
+	requestStruct := rsslib.RssItem{Uuid: "68e9e42d-a0ba-5a4c-591b-000000000001", Channel: "TestChannel", Title: "testtitle1", Link: "http://localhost", UpdateDate: updateDate}
+	requestJson, _ := json.Marshal(requestStruct)
+	requestBody := string(requestJson)
+	body = genericRouterApiTestWithRequestBody(t, "POST", "/item", 201, strings.NewReader(requestBody))
+
+	bodyCreateResponse := ItemCUDResult{}
+	if err := json.Unmarshal(body, &bodyCreateResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyCreateResponse)
+	assert.NotEmpty(bodyCreateResponse.Item)
+	assert.NotEmpty(bodyCreateResponse.Status)
+	assert.Equal("updated", bodyCreateResponse.Status)
+
+	// count items finally
+	body = genericRouterApiTest(t, "GET", "/itemscount", 200)
+
+	bodyCountResponse = ItemCount{}
+	if err := json.Unmarshal(body, &bodyCountResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.Equal(initialCount, bodyCountResponse.Count)
+
+	// check id finally
+	body = genericRouterApiTest(t, "GET", "/item/68e9e42d-a0ba-5a4c-591b-000000000001", 200)
+
+	bodyReadResponse = rsslib.RssItem{}
+	if err := json.Unmarshal(body, &bodyReadResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyReadResponse)
+	assert.Equal(uint64(0), bodyReadResponse.Id)
+	assert.Equal(initialId, bodyReadResponse.Id)
+	assert.NotEmpty(bodyReadResponse.Uuid)
+	assert.Equal("68e9e42d-a0ba-5a4c-591b-000000000001", bodyReadResponse.Uuid)
+	assert.NotEmpty(bodyReadResponse.PublishDate)
+	assert.NotEmpty(bodyReadResponse.UpdateDate)
+
+	// check items finally
+	body = genericRouterApiTest(t, "GET", "/items", 200)
+
+	bodyResponse := rsslib.RssItems{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	var resp1 rsslib.RssItem = bodyResponse[0]
+	assert.Equal(uint64(0), resp1.Id)
+	assert.Equal("68e9e42d-a0ba-5a4c-591b-000000000001", resp1.Uuid)
+	var resp2 rsslib.RssItem = bodyResponse[1]
+	assert.Equal(uint64(1), resp2.Id)
+	assert.Equal("68e9e42d-a0ba-5a4c-591b-000000000002", resp2.Uuid)
+}
+
+func TestRouterItemUpdate2WithoutUdateDate(t *testing.T) {
+	assert := assert.New(t)
+	// count items initially
+	body := genericRouterApiTest(t, "GET", "/itemscount", 200)
+
+	bodyCountResponse := ItemCount{}
+	if err := json.Unmarshal(body, &bodyCountResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	var initialCount uint64 = bodyCountResponse.Count
+
+	// check id initially
+	body = genericRouterApiTest(t, "GET", "/item/68e9e42d-a0ba-5a4c-591b-000000000002", 200)
+
+	bodyReadResponse := rsslib.RssItem{}
+	if err := json.Unmarshal(body, &bodyReadResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	var initialId uint64 = bodyReadResponse.Id
+
+	// create duplicate
+	requestStruct := rsslib.RssItem{Uuid: "68e9e42d-a0ba-5a4c-591b-000000000002", Channel: "TestChannel", Title: "testtitle2", Link: "http://localhost"}
+	requestJson, _ := json.Marshal(requestStruct)
+	requestBody := string(requestJson)
+	body = genericRouterApiTestWithRequestBody(t, "POST", "/item", 201, strings.NewReader(requestBody))
+
+	bodyCreateResponse := ItemCUDResult{}
+	if err := json.Unmarshal(body, &bodyCreateResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyCreateResponse)
+	assert.NotEmpty(bodyCreateResponse.Item)
+	assert.NotEmpty(bodyCreateResponse.Status)
+	assert.Equal("updated", bodyCreateResponse.Status)
+
+	// count items finally
+	body = genericRouterApiTest(t, "GET", "/itemscount", 200)
+
+	bodyCountResponse = ItemCount{}
+	if err := json.Unmarshal(body, &bodyCountResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.Equal(initialCount, bodyCountResponse.Count)
+
+	// check id finally
+	body = genericRouterApiTest(t, "GET", "/item/68e9e42d-a0ba-5a4c-591b-000000000002", 200)
+
+	bodyReadResponse = rsslib.RssItem{}
+	if err := json.Unmarshal(body, &bodyReadResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	assert.NotNil(bodyReadResponse)
+	assert.Equal(uint64(1), bodyReadResponse.Id)
+	assert.Equal(initialId, bodyReadResponse.Id)
+	assert.NotEmpty(bodyReadResponse.Uuid)
+	assert.Equal("68e9e42d-a0ba-5a4c-591b-000000000002", bodyReadResponse.Uuid)
+	assert.NotEmpty(bodyReadResponse.PublishDate)
+	assert.NotEmpty(bodyReadResponse.UpdateDate)
+
+	// check items finally
+	body = genericRouterApiTest(t, "GET", "/items", 200)
+
+	bodyResponse := rsslib.RssItems{}
+	if err := json.Unmarshal(body, &bodyResponse); err != nil {
+		fmt.Println("ERROR: ", err)
+	}
+	var resp1 rsslib.RssItem = bodyResponse[0]
+	assert.Equal(uint64(0), resp1.Id)
+	assert.Equal("68e9e42d-a0ba-5a4c-591b-000000000001", resp1.Uuid)
+	var resp2 rsslib.RssItem = bodyResponse[1]
+	assert.Equal(uint64(1), resp2.Id)
+	assert.Equal("68e9e42d-a0ba-5a4c-591b-000000000002", resp2.Uuid)
 }
 
 func TestRouterItemCreateWithoutUuid(t *testing.T) {

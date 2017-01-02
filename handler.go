@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"restcache"
 	"rsslib"
-	"strconv"
 	"time"
 )
 
@@ -29,14 +28,11 @@ func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 	var item rsslib.RssItem
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
-		log.Error("err in nil")
 		panic(err)
 	}
 	if err := r.Body.Close(); err != nil {
-		log.Error("11")
 		panic(err)
 	}
-	log.Info("no err")
 
 	if err := json.Unmarshal(body, &item); err != nil {
 		statusCode = 422 // 422 - Unprocessable Entity
@@ -54,13 +50,7 @@ func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 		statusCode = 422 // 422 - Unprocessable Entity
 		result = ItemCUDResult{Item: item.Uuid, Status: "failed", Desc: "link is empty"}
 	} else {
-		searchItem := findItem(item.Uuid)
-		if searchItem.Uuid == "" {
-			result = ItemCUDResult{Item: item.Uuid, Status: "created", Desc: strconv.FormatUint(item.Id, 10)}
-		} else {
-			addItem(item)
-			result = ItemCUDResult{Item: item.Uuid, Status: "updated", Desc: strconv.FormatUint(item.Id, 10)}
-		}
+		result = addOrUpdateItem(item)
 	}
 
 	w.WriteHeader(statusCode)
@@ -80,7 +70,7 @@ func HandlerItemRead(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 	var result rsslib.RssItem
 
 	itemUuid := ps.ByName("uuid")
-	result = findItem(itemUuid)
+	result = getItem(itemUuid)
 
 	if result.Uuid == "" {
 		w.WriteHeader(http.StatusNotFound)
