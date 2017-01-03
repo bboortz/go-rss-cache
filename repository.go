@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/bboortz/go-rsslib"
+	//"go-rsslib"
 	//	"github.com/davecgh/go-spew/spew"
-	"reflect"
 	"strconv"
 	"time"
 )
@@ -62,7 +62,10 @@ func addOrUpdateItem(s rsslib.RssItem) ItemCUDResult {
 		result = ItemCUDResult{Item: resultItem.Uuid, Status: "created", Desc: strconv.FormatUint(resultItem.Id, 10)}
 	} else {
 		s.Id = searchItem.Id
-		if !reflect.DeepEqual(s, searchItem) {
+		if s.UpdateDate == "" {
+			s.UpdateDate = searchItem.UpdateDate
+		}
+		if !s.CompareWithoutPublishDate(searchItem) {
 			resultItem = updateItem(uint64(searchKey), s)
 			result = ItemCUDResult{Item: resultItem.Uuid, Status: "updated", Desc: strconv.FormatUint(resultItem.Id, 10)}
 		} else {
