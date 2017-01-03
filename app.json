@@ -1,0 +1,14 @@
+{
+  "name": "go-rss-cache",
+  "description": "A RESTFul cache for rss items written in go",
+  "keywords": [
+    "go",
+    "golang",
+    "rss",
+    "cache"
+  ],
+  "image": "heroku/go:1.6",
+  "mount_dir": "src/github.com/bboortz/go-rss-cache",
+  "website": "http://github.com/boortz/go-rss-cache",
+  "repository": "http://github.com/boortz/go-rss-cache"
+}
