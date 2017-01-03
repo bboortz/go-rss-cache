@@ -2,10 +2,15 @@ package main
 
 import (
 	"net/http"
+	"os"
 )
 
 func main() {
-	var ipport string = ":9090"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "9090"
+	}
+	var ipport string = ":" + port
 	router := NewRouter()
 
 	log.Info("listening on: ", ipport)
