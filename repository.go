@@ -32,6 +32,7 @@ func addItem(s rsslib.RssItem) rsslib.RssItem {
 	}
 
 	s.Id = currentId
+	s.UpdateCount = 0
 	rssItems = append(rssItems, s)
 	currentId += 1
 	logItemAdded(s)
@@ -47,6 +48,7 @@ func updateItem(i uint64, s rsslib.RssItem) rsslib.RssItem {
 	}
 
 	s.Id = i
+	s.UpdateCount++
 	rssItems[i] = s
 	logItemUpdated(s)
 	return s
