@@ -1,0 +1,61 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "k11bBfbX/Btfl0pK/7+tNbUTiVQ=",
+			"path": "github.com/bboortz/go-restcache",
+			"revision": "3fb79f75ad36cde12422ebf7dffd94b826105dac",
+			"revisionTime": "2017-01-02T22:53:19Z"
+		},
+		{
+			"checksumSHA1": "PuqeGTyx7m8rH8BbwEMHIxfLe2c=",
+			"path": "github.com/bboortz/go-rss-cache",
+			"revision": "ebcc3bc3cde72860ba41493446a06243bcd1a165",
+			"revisionTime": "2017-01-04T10:54:55Z"
+		},
+		{
+			"checksumSHA1": "FXHYVO5qoNMT2QMLHoDZC9p0bT8=",
+			"path": "github.com/bboortz/go-rsslib",
+			"revision": "221120e07c696298dea67affe3ce4bc78a8f0189",
+			"revisionTime": "2017-01-04T10:51:32Z"
+		},
+		{
+			"checksumSHA1": "ZM3EPKNdmghWJIw+SRpu8Amx8ok=",
+			"path": "github.com/bboortz/go-utils",
+			"revision": "77f5f5e5e6a999b81ea0dcd9b00d90921ee12bc3",
+			"revisionTime": "2017-01-04T10:09:24Z"
+		},
+		{
+			"checksumSHA1": "dvabztWVQX8f6oMLRyv4dLH+TGY=",
+			"path": "github.com/davecgh/go-spew/spew",
+			"revision": "346938d642f2ec3594ed81d874461961cd0faa76",
+			"revisionTime": "2016-10-29T20:57:26Z"
+		},
+		{
+			"checksumSHA1": "Y3U6on66N0BszKXYvb2Q+qpG6f4=",
+			"path": "github.com/julienschmidt/httprouter",
+			"revision": "5dd70ee059943e81987a817fa1a755b11dd119c1",
+			"revisionTime": "2016-12-03T08:33:52Z"
+		},
+		{
+			"checksumSHA1": "BoXdUBWB8UnSlFlbnuTQaPqfCGk=",
+			"path": "github.com/op/go-logging",
+			"revision": "970db520ece77730c7e4724c61121037378659d9",
+			"revisionTime": "2016-03-15T20:05:05Z"
+		},
+		{
+			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
+			"path": "github.com/pmezard/go-difflib/difflib",
+			"revision": "792786c7400a136282c1664665ae0a8db921c6c2",
+			"revisionTime": "2016-01-10T10:55:54Z"
+		},
+		{
+			"checksumSHA1": "JXUVA1jky8ZX8w09p2t5KLs97Nc=",
+			"path": "github.com/stretchr/testify/assert",
+			"revision": "2402e8e7a02fc811447d11f881aa9746cdc57983",
+			"revisionTime": "2016-12-17T20:04:45Z"
+		}
+	],
+	"rootPath": "github.com/bboortz/go-rss-cache"
+}
