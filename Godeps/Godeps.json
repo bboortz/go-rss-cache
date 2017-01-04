@@ -1,5 +1,5 @@
 {
-	"ImportPath": "go-rss-cache",
+	"ImportPath": "github.com/bboortz/go-rss-cache",
 	"GoVersion": "go1.6",
 	"GodepVersion": "v75",
 	"Deps": [
@@ -9,7 +9,7 @@
 		},
 		{
 			"ImportPath": "github.com/bboortz/go-rsslib",
-			"Rev": "dbc78fa3bfee3ad6df6d6dc267b5ca356f3cd210"
+			"Rev": "965c99240e5f81af1ac32b457348ecff839ca33d"
 		},
 		{
 			"ImportPath": "github.com/bboortz/go-utils",

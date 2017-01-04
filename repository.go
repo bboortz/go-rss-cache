@@ -65,7 +65,8 @@ func addOrUpdateItem(s rsslib.RssItem) ItemCUDResult {
 		if s.UpdateDate == "" {
 			s.UpdateDate = searchItem.UpdateDate
 		}
-		if !s.CompareWithoutPublishDate(searchItem) {
+		s.Diff(searchItem)
+		if !s.Compare(searchItem) {
 			resultItem = updateItem(uint64(searchKey), s)
 			result = ItemCUDResult{Item: resultItem.Uuid, Status: "updated", Desc: strconv.FormatUint(resultItem.Id, 10)}
 		} else {
