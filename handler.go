@@ -22,6 +22,7 @@ var headerContentTypeValue string = "application/json; charset=UTF-8"
 func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var statusCode int = http.StatusCreated
 	var result ItemCUDResult
 
@@ -66,6 +67,7 @@ func HandlerItemCreate(w http.ResponseWriter, r *http.Request, ps httprouter.Par
 func HandlerItemRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var statusCode int = http.StatusOK
 	var result rsslib.RssItem
 
@@ -93,6 +95,7 @@ func HandlerItemRead(w http.ResponseWriter, r *http.Request, ps httprouter.Param
 func HandlerItemsRead(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
 	var statusCode int = http.StatusOK
 	var result rsslib.RssItems = rssItems
 
@@ -109,6 +112,11 @@ func HandlerItemsRead(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 func HandlerItemsCount(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	start := time.Now()
 	w.Header().Set(headerContentTypeKey, headerContentTypeValue)
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	//w.Header().Set("Access-Control-Allow-Credentials", "true")
+	//w.Header().Set("Access-Control-Allow-Origin", "go-rss-cache.herokuapp.com")
+	//w.Header().Set("Access-Control-Allow-Origin", "http://localhost:8080")
+
 	var statusCode int = http.StatusOK
 	result := ItemCount{Count: rssItems.Len()}
 

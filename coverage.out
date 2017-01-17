@@ -27,9 +27,9 @@ github.com/bboortz/go-rss-cache/handler.go:84.58,85.13 1 0
 github.com/bboortz/go-rss-cache/handler.go:93.85,100.58 6 1
 github.com/bboortz/go-rss-cache/handler.go:103.2,103.64 1 1
 github.com/bboortz/go-rss-cache/handler.go:100.58,101.13 1 0
-github.com/bboortz/go-rss-cache/handler.go:109.86,116.58 6 1
-github.com/bboortz/go-rss-cache/handler.go:119.2,119.64 1 1
-github.com/bboortz/go-rss-cache/handler.go:116.58,117.13 1 0
+github.com/bboortz/go-rss-cache/handler.go:109.86,120.58 8 1
+github.com/bboortz/go-rss-cache/handler.go:123.2,123.64 1 1
+github.com/bboortz/go-rss-cache/handler.go:120.58,121.13 1 0
 github.com/bboortz/go-rss-cache/logger.go:11.37,13.2 1 1
 github.com/bboortz/go-rss-cache/logger.go:15.39,17.2 1 1
 github.com/bboortz/go-rss-cache/logger.go:19.53,21.2 1 1
